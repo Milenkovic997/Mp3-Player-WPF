@@ -251,7 +251,7 @@ namespace Mp3_Player
             btnNoShuffle.Visibility = Visibility.Collapsed;
         }
 
-        // PREVIOUS AND NEXT BUTTONS
+        // PREVIOUS AND NEXT FUNCTIONS
         private void btnPrevious_Click(object sender, RoutedEventArgs e)
         {
             if (_shuffle)
@@ -341,6 +341,53 @@ namespace Mp3_Player
                 }
             }
         }
+        private void SliderSongTime_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (SliderSongTime.Value >= 10)
+            {
+                if (_shuffle)
+                {
+                    _mediaPlayer.Play();
+                    int index = 0;
+                    foreach (StackPanel sp in addedSongsScrollViewer.Children.OfType<StackPanel>())
+                    {
+
+                        if (sp.Background == Brushes.LightSlateGray)
+                        {
+                            index = _songList.IndexOf(sp.Tag.ToString());
+
+                        }
+
+                    }
+                    Random rnd = new Random();
+                    int newIndex = rnd.Next(0, _songList.Count);
+                    while (newIndex == index) newIndex = rnd.Next(0, _songList.Count);
+
+                    playSongFile(_songList[newIndex]);
+                }
+                else
+                {
+                    _mediaPlayer.Play();
+                    bool onlyOnce = false;
+                    foreach (StackPanel sp in addedSongsScrollViewer.Children.OfType<StackPanel>())
+                    {
+                        if (onlyOnce == false)
+                        {
+                            if (sp.Background == Brushes.LightSlateGray)
+                            {
+                                onlyOnce = true;
+                                int index = _songList.IndexOf(sp.Tag.ToString());
+                                if (index < _songList.Count - 1) { playSongFile(_songList[index + 1]); }
+                                else
+                                {
+                                    playSongFile(_songList.FirstOrDefault());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         // VOLUME CONTROL
         private void volumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -395,5 +442,6 @@ namespace Mp3_Player
         {
             Close();
         }
+
     }
 }

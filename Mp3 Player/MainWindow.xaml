@@ -146,7 +146,7 @@
             </Button>
             <Label x:Name="lblTotal" Foreground="White" FontSize="24" FontWeight="Bold" Height="32" FontStyle="Normal" Content="00:00" Margin="200,50,0,0" FontFamily="Courier New"/>
         </WrapPanel>
-        <Slider x:Name="SliderSongTime" Width="1131" Height="20" PreviewMouseDown="SliderSongTime_PreviewMouseDown" PreviewMouseUp="SliderSongTime_PreviewMouseUp" Padding="0,20,0,0" Margin="0,10,0,0" IsMoveToPointEnabled="True"/>
+        <Slider x:Name="SliderSongTime" Width="1131" Height="20" PreviewMouseDown="SliderSongTime_PreviewMouseDown" PreviewMouseUp="SliderSongTime_PreviewMouseUp" Padding="0,20,0,0" Margin="0,10,0,0" IsMoveToPointEnabled="True" ValueChanged="SliderSongTime_ValueChanged"/>
 
     </StackPanel>
 </Window>
