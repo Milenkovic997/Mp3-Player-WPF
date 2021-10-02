@@ -116,6 +116,7 @@ namespace Mp3_Player
         private void SliderSongTime_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             _timer.Stop();
+            _sliderTimer.Stop();
         }
         private void SliderSongTime_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
