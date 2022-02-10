@@ -12,6 +12,10 @@ using System.Windows.Threading;
 
 namespace Mp3_Player
 {
+
+    // VISUALIZER
+    // TRCECA SLOVA AKO JE NASLOV PREDUGACAK
+
     public partial class MainWindow : Window
     {
         // GLOBAL VALUES
@@ -38,6 +42,9 @@ namespace Mp3_Player
             _sliderTimer.Start();
 
             volumeSlider.Value = 1;
+
+            _shuffle = Properties.Settings.Default.shuffle;
+            checkShuffleState();
 
             SliderSongTime.ApplyTemplate();
             Thumb thumb = (SliderSongTime.Template.FindName("PART_Track", SliderSongTime) as Track).Thumb;
@@ -241,14 +248,28 @@ namespace Mp3_Player
         private void btnShuffle_Click(object sender, RoutedEventArgs e)
         {
             _shuffle = false;
-            btnShuffle.Visibility = Visibility.Collapsed;
-            btnNoShuffle.Visibility = Visibility.Visible;
+            checkShuffleState();
         }
         private void btnNoShuffle_Click(object sender, RoutedEventArgs e)
         {
             _shuffle = true;
-            btnShuffle.Visibility = Visibility.Visible;
-            btnNoShuffle.Visibility = Visibility.Collapsed;
+            checkShuffleState();
+        }
+        private void checkShuffleState()
+        {
+            if (_shuffle)
+            {
+                btnShuffle.Visibility = Visibility.Visible;
+                btnNoShuffle.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                btnShuffle.Visibility = Visibility.Collapsed;
+                btnNoShuffle.Visibility = Visibility.Visible;
+            }
+
+            Properties.Settings.Default.shuffle = _shuffle;
+            Properties.Settings.Default.Save();
         }
 
         // PREVIOUS AND NEXT FUNCTIONS
@@ -442,6 +463,5 @@ namespace Mp3_Player
         {
             Close();
         }
-
     }
 }
