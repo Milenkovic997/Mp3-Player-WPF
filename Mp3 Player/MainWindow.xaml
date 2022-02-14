@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Mp3_Player"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="MainWindow" Height="700" Width="1200" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Topmost="True" WindowStyle="None" KeyDown="Window_KeyDown" Background="#FF111111">
+        Title="MainWindow" Height="700" Width="1200" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None" KeyDown="Window_KeyDown" Background="Crimson">
 
     <!-- VISUAL_DESIGN_STYLES -->
     <Window.Resources>
@@ -87,66 +87,139 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <StackPanel Orientation="Vertical">
+    <materialDesign:DialogHost>
+        <!-- DRAWER_HOST_LEFT_AND_RIGHT -->
+        <materialDesign:DrawerHost HorizontalAlignment="Center" VerticalAlignment="Center" BorderThickness="2" BorderBrush="#FF1D1D1D" Height="700" Width="1200" Margin="0" BottomDrawerCloseOnClickAway="False">
 
-        <StackPanel Orientation="Horizontal">
-            <StackPanel Height="33" Width="1167" Background="#FF1D1D1D" MouseLeftButtonDown="dragFrameFunction"/>
-            <Grid x:Name="btnExit" Height="33" Width="33" Background="LightGray" HorizontalAlignment="Right" MouseEnter="btnExit_MouseEnter" MouseLeave="btnExit_MouseLeave" MouseLeftButtonDown="btnExit_MouseLeftButtonDown">
-                <Label x:Name="lblExit" Foreground="Black" FontWeight="Bold" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center" Height="42" FontFamily="Microsoft Sans Serif" MouseLeftButtonDown="btnExit_MouseLeftButtonDown">X</Label>
-            </Grid>
-        </StackPanel>
+            <!-- DRAWER_HOST -->
+            <materialDesign:DrawerHost.Style>
+                <Style TargetType="materialDesign:DrawerHost" BasedOn="{StaticResource {x:Type materialDesign:DrawerHost}}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsChecked}" Value="True">
+                            <Setter Property="OverlayBackground" Value="{DynamicResource PrimaryHueMidBrush}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </materialDesign:DrawerHost.Style>
 
-        <ScrollViewer Background="#FF171717" Height="458" BorderBrush="White" BorderThickness="2,2,2,2" Margin="10,10,10,0" RenderTransformOrigin="0.5,0.5">
-            <ScrollViewer.RenderTransform>
-                <TransformGroup>
-                    <ScaleTransform/>
-                    <SkewTransform AngleX="0.256"/>
-                    <RotateTransform/>
-                    <TranslateTransform X="0.996"/>
-                </TransformGroup>
-            </ScrollViewer.RenderTransform>
-            <StackPanel x:Name="addedSongsScrollViewer" />
-        </ScrollViewer>
+            <!-- DRAWER_RIGHT -->
+            <materialDesign:DrawerHost.RightDrawerContent>
+                <Grid Background="#FF1D1D1D">
+                    <StackPanel Width="900" Background="#FF060606" Margin="3, 0,0,0">
+                        <TextBlock Foreground="White" FontFamily="Bahnschrift Condensed" FontSize="45" FontWeight="Bold" Margin="15,20,0,0" Text="Download a song from YouTube" HorizontalAlignment="Center"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+                            <TextBox x:Name="textLocationToDownload" Width="805" materialDesign:HintAssist.Hint="C:\Desktop" Foreground="White" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="24" FontFamily="Bahnschrift Condensed"/>
+                            <Button x:Name="btnLocation" Width="54" Margin="10,0,0,0" Background="Black" Foreground="#DDFFFFFF" VerticalAlignment="Center" Click="btnLocation_Click" BorderBrush="White" Height="38">
+                                <materialDesign:PackIcon Kind="Folder" Height="30" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Button>
+                        </StackPanel>
+                        <StackPanel x:Name="panelSong" Orientation="Horizontal" Margin="0,10,0,0" >
+                            <TextBox x:Name="textYoutubeUrl" Width="742" materialDesign:HintAssist.Hint="Enter a song name" Foreground="White" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="24" FontFamily="Bahnschrift Condensed"/>
+                            <Button x:Name="youtubeButtonUrl" Width="117" Margin="10,0,0,0" Click="youtubeButtonUrl_Click" Background="Black" Foreground="#DDFFFFFF" VerticalAlignment="Center" BorderBrush="White" Height="39">
+                                <StackPanel Orientation="Horizontal" Width="85" HorizontalAlignment="Center">
+                                    <TextBlock VerticalAlignment="Center" FontFamily="Bahnschrift Condensed" FontSize="24" Width="60" FontWeight="Bold">Search</TextBlock>
+                                    <materialDesign:PackIcon Kind="Youtube" Height="24" Width="26" VerticalAlignment="Center"/>
+
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                        <ScrollViewer x:Name="scrollViewer" Height="477" Margin="5,20,5,0" Width="880">
+                            <StackPanel x:Name="listSearchResult">
+
+                            </StackPanel>
+                        </ScrollViewer>
+
+                    </StackPanel>
+                </Grid>
+            </materialDesign:DrawerHost.RightDrawerContent>
+
+            <StackPanel Orientation="Vertical" Background="#FF060606">
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel Height="33" Width="1163" Background="#FF1D1D1D" MouseLeftButtonDown="dragFrameFunction"/>
+                    <Grid x:Name="btnExit" Height="33" Width="33" Background="#FF1D1D1D" HorizontalAlignment="Right" MouseEnter="btnExit_MouseEnter" MouseLeave="btnExit_MouseLeave" MouseLeftButtonDown="btnExit_MouseLeftButtonDown">
+                        <Label x:Name="lblExit" Foreground="#FFC5C5C5" FontWeight="Bold" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center" Height="45" FontFamily="Calibri" MouseLeftButtonDown="btnExit_MouseLeftButtonDown" Width="24">X</Label>
+                    </Grid>
+                </StackPanel>
+
+                <ScrollViewer x:Name="mainScrollViewer" Background="#FF121111" Height="444" BorderBrush="White" BorderThickness="2,2,2,2" Margin="10,10,10,0" RenderTransformOrigin="0.5,0.5" VerticalScrollBarVisibility="Disabled">
+                    <ScrollViewer.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform/>
+                            <SkewTransform AngleX="0.256"/>
+                            <RotateTransform/>
+                            <TranslateTransform X="0.996"/>
+                        </TransformGroup>
+                    </ScrollViewer.RenderTransform>
+                    <StackPanel x:Name="addedSongsScrollViewer" />
+                </ScrollViewer>
+
+                <Label x:Name="lblStatus" Content="- No Songs Selected -" HorizontalContentAlignment="Center" Margin="5,15,5,5" Height="53" FontSize="36" FontWeight="Bold" Foreground="#DDFFFFFF" Width="1162" FontFamily="Bahnschrift Condensed" />
+                <WrapPanel HorizontalAlignment="Center" Height="79">
+                    <Label x:Name="lblCurrent" Foreground="White" FontSize="24" FontWeight="Bold" Height="32" FontStyle="Normal" Content="00:00" Margin="0,50,90,0" FontFamily="Bahnschrift Condensed" Width="60" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                    <materialDesign:PackIcon x:Name="volumeIconOn" Kind="VolumeHigh" Height="40" Width="40" Foreground="#DDFFFFFF" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,13,0" PreviewMouseLeftButtonDown="volumeIconOn_PreviewMouseLeftButtonDown" Background="#FF060606"/>
+                    <materialDesign:PackIcon x:Name="volumeIconOff" Kind="VolumeMute" Height="40" Width="40" Foreground="#DDFFFFFF" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,13,0" Visibility="Collapsed" PreviewMouseLeftButtonDown="volumeIconOff_PreviewMouseLeftButtonDown" Background="#FF060606"/>
+
+                    <Slider x:Name="volumeSlider" Width="202" Height="20" BorderThickness="0,0,40,0" ValueChanged="volumeSlider_ValueChanged" LargeChange="0.1" Maximum="1" Foreground="White" BorderBrush="Transparent" Margin="0,0,10,0" />
+                    <Button x:Name="btnShuffle" Style="{StaticResource MaterialDesignFloatingActionDarkButton}" Margin="15,0,5,0" Width="48" Height="48" Click="btnShuffle_Click" Visibility="Collapsed" Background="Black" BorderBrush="White" Foreground="#DDFFFFFF">
+                        <materialDesign:PackIcon Kind="Shuffle" Height="40" Width="40"/>
+                    </Button>
+                    <Button x:Name="btnNoShuffle" Style="{StaticResource MaterialDesignFloatingActionDarkButton}" Margin="15,0,5,0" Width="48" Height="48" Click="btnNoShuffle_Click" Background="Black" BorderBrush="White">
+                        <materialDesign:PackIcon Kind="ShuffleDisabled" Height="40" Width="40"/>
+                    </Button>
+
+                    <Button x:Name="btnPrevious" Style="{StaticResource MaterialDesignFloatingActionDarkButton}" Margin="5,0,5,0" Width="48" Height="48" Click="btnPrevious_Click" Background="Black" BorderBrush="White">
+                        <materialDesign:PackIcon Kind="PreviousTitle" Height="40" Width="40"/>
+                    </Button>
+                    <Button x:Name="btnPlay" Click="btnPlay_Click" Style="{StaticResource MaterialDesignFloatingActionDarkButton}" Margin="5,0,5,0" Width="64" Height="64" Background="#FF444444" BorderBrush="White">
+                        <materialDesign:PackIcon Kind="Play" Height="55" Width="55"/>
+                    </Button>
+
+                    <Button x:Name="btnPause" Click="btnPause_Click" Style="{StaticResource MaterialDesignFloatingActionDarkButton}" Margin="5,0,5,0" Width="64" Height="64" Visibility="Collapsed" Background="Black" BorderBrush="White">
+                        <materialDesign:PackIcon Kind="Pause" Height="55" Width="55"/>
+                    </Button>
+                    <Button x:Name="btnNext" Style="{StaticResource MaterialDesignFloatingActionDarkButton}" Margin="5,0,5,0" Width="48" Height="48" Click="btnNext_Click" Background="Black" BorderBrush="White">
+                        <materialDesign:PackIcon Kind="NextTitle" Height="40" Width="40"/>
+                    </Button>
+
+                    <Button x:Name="btnStop" Click="btnStop_Click" Style="{StaticResource MaterialDesignFloatingActionDarkButton}" Margin="5,0,5,0" Width="48" Height="48" Background="Black" BorderBrush="White">
+                        <materialDesign:PackIcon Kind="Stop" Height="40" Width="40"/>
+                    </Button>
+                    <Button x:Name="btnAdd" Style="{StaticResource MaterialDesignFloatingActionDarkButton}" Margin="65,0,5,0" Width="48" Height="48" Click="btnAdd_Click" Background="Black" BorderBrush="White">
+                        <materialDesign:PackIcon Kind="Add" Height="40" Width="40"/>
+                    </Button>
+                    <Button Style="{StaticResource MaterialDesignFloatingActionDarkButton}" Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}" CommandParameter="{x:Static Dock.Right}"  Margin="5,0,5,0" Width="48" Height="48" Foreground="#DDFF0000" Background="Black" BorderBrush="White">
+                        <materialDesign:PackIcon Kind="VideoYoutube" Height="40" Width="40" Foreground="#DDFF1515"/>
+                    </Button>
+                    <Label x:Name="lblTotal" Foreground="White" FontSize="24" FontWeight="Bold" Height="32" FontStyle="Normal" Content="00:00" Margin="190,50,0,0" FontFamily="Bahnschrift Condensed" Width="60" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                </WrapPanel>
+                <Slider x:Name="SliderSongTime" Width="1131" Height="20" PreviewMouseDown="SliderSongTime_PreviewMouseDown" PreviewMouseUp="SliderSongTime_PreviewMouseUp" Padding="0,20,0,0" Margin="0,12,0,0" IsMoveToPointEnabled="True" ValueChanged="SliderSongTime_ValueChanged" Foreground="White"/>
+
+            </StackPanel>
+        </materialDesign:DrawerHost>
+    </materialDesign:DialogHost>
 
 
-        <Label x:Name="lblStatus" Content="No Songs Selected..." HorizontalContentAlignment="Center" Margin="5,10,5,5" Height="46" FontSize="36" FontWeight="Bold" Foreground="#DDFFFFFF" Width="1162" FontFamily="Courier New" />
-        <WrapPanel HorizontalAlignment="Center" Height="79">
-            <Label x:Name="lblCurrent" Foreground="White" FontSize="24" FontWeight="Bold" Height="32" FontStyle="Normal" Content="00:00" Margin="0,50,90,0" FontFamily="Courier New"/>
 
-            <materialDesign:PackIcon x:Name="volumeIconOn" Kind="VolumeHigh" Height="40" Width="40" Foreground="#DDFFFFFF" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,13,0" PreviewMouseLeftButtonDown="volumeIconOn_PreviewMouseLeftButtonDown" Background="#FF111111"/>
-            <materialDesign:PackIcon x:Name="volumeIconOff" Kind="VolumeMute" Height="40" Width="40" Foreground="#DDFFFFFF" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,13,0" Visibility="Collapsed" PreviewMouseLeftButtonDown="volumeIconOff_PreviewMouseLeftButtonDown" Background="#FF111111"/>
 
-            <Slider x:Name="volumeSlider" Width="202" Height="20" BorderThickness="0,0,40,0" ValueChanged="volumeSlider_ValueChanged" LargeChange="0.1" Maximum="1"/>
-            <Button x:Name="btnShuffle" Style="{StaticResource MaterialDesignFloatingActionDarkButton}" Margin="15,0,5,0" Width="48" Height="48" Click="btnShuffle_Click" Visibility="Collapsed">
-                <materialDesign:PackIcon Kind="Shuffle" Height="40" Width="40"/>
-            </Button>
-            <Button x:Name="btnNoShuffle" Style="{StaticResource MaterialDesignFloatingActionDarkButton}" Margin="15,0,5,0" Width="48" Height="48" Click="btnNoShuffle_Click">
-                <materialDesign:PackIcon Kind="ShuffleDisabled" Height="40" Width="40"/>
-            </Button>
 
-            <Button x:Name="btnPrevious" Style="{StaticResource MaterialDesignFloatingActionDarkButton}" Margin="5,0,5,0" Width="48" Height="48" Click="btnPrevious_Click">
-                <materialDesign:PackIcon Kind="PreviousTitle" Height="40" Width="40"/>
-            </Button>
-            <Button x:Name="btnPlay" Click="btnPlay_Click" Style="{StaticResource MaterialDesignFloatingActionDarkButton}" Margin="5,0,5,0" Width="64" Height="64">
-                <materialDesign:PackIcon Kind="Play" Height="55" Width="55"/>
-            </Button>
 
-            <Button x:Name="btnPause" Click="btnPause_Click" Style="{StaticResource MaterialDesignFloatingActionDarkButton}" Margin="5,0,5,0" Width="64" Height="64" Visibility="Collapsed">
-                <materialDesign:PackIcon Kind="Pause" Height="55" Width="55"/>
-            </Button>
-            <Button x:Name="btnNext" Style="{StaticResource MaterialDesignFloatingActionDarkButton}" Margin="5,0,5,0" Width="48" Height="48" Click="btnNext_Click">
-                <materialDesign:PackIcon Kind="NextTitle" Height="40" Width="40"/>
-            </Button>
 
-            <Button x:Name="btnStop" Click="btnStop_Click" Style="{StaticResource MaterialDesignFloatingActionDarkButton}" Margin="5,0,5,0" Width="48" Height="48">
-                <materialDesign:PackIcon Kind="Stop" Height="40" Width="40"/>
-            </Button>
-            <Button x:Name="btnAdd" Style="{StaticResource MaterialDesignFloatingActionDarkButton}" Margin="110,0,5,0" Width="48" Height="48" Click="btnAdd_Click">
-                <materialDesign:PackIcon Kind="Add" Height="40" Width="40"/>
-            </Button>
-            <Label x:Name="lblTotal" Foreground="White" FontSize="24" FontWeight="Bold" Height="32" FontStyle="Normal" Content="00:00" Margin="190,50,0,0" FontFamily="Courier New"/>
-        </WrapPanel>
-        <Slider x:Name="SliderSongTime" Width="1131" Height="20" PreviewMouseDown="SliderSongTime_PreviewMouseDown" PreviewMouseUp="SliderSongTime_PreviewMouseUp" Padding="0,20,0,0" Margin="0,10,0,0" IsMoveToPointEnabled="True" ValueChanged="SliderSongTime_ValueChanged"/>
 
-    </StackPanel>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </Window>

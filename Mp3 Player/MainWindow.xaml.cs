@@ -1,21 +1,26 @@
-﻿using Microsoft.Win32;
+﻿using MaterialDesignThemes.Wpf;
+using MediaToolkit;
+using MediaToolkit.Model;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Cache;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using VideoLibrary;
 
 namespace Mp3_Player
 {
-
-    // VISUALIZER
-    // TRCECA SLOVA AKO JE NASLOV PREDUGACAK
-
     public partial class MainWindow : Window
     {
         // GLOBAL VALUES
@@ -41,7 +46,8 @@ namespace Mp3_Player
             _sliderTimer.Tick += _sliderTimer_Tick;
             _sliderTimer.Start();
 
-            volumeSlider.Value = 1;
+            volumeSlider.Value = Properties.Settings.Default.volume;
+            volumeIconCheck();
 
             _shuffle = Properties.Settings.Default.shuffle;
             checkShuffleState();
@@ -73,9 +79,9 @@ namespace Mp3_Player
 
             foreach (StackPanel sp in addedSongsScrollViewer.Children.OfType<StackPanel>())
             {
-                sp.Background = new SolidColorBrush(Color.FromArgb(0xFF, 45, 45, 45));
+                sp.Background = new SolidColorBrush(Color.FromArgb(0xFF, 35, 35, 35));
             }
-            spanel.Background = Brushes.LightSlateGray;
+            spanel.Background = Brushes.Crimson;
 
             foreach (TextBlock tb in spanel.Children.OfType<TextBlock>())
             {
@@ -90,7 +96,7 @@ namespace Mp3_Player
             foreach (StackPanel sp in addedSongsScrollViewer.Children.OfType<StackPanel>())
             {
                 sp.Background = new SolidColorBrush(Color.FromArgb(0xFF, 45, 45, 45));
-                if(sp.Tag == filename)
+                if (sp.Tag == filename)
                 {
                     sp.Background = Brushes.LightSlateGray;
                     foreach (TextBlock tb in sp.Children.OfType<TextBlock>())
@@ -155,7 +161,7 @@ namespace Mp3_Player
         private void btnPause_Click(object sender, RoutedEventArgs e)
         {
             _mediaPlayer.Pause();
-            lblStatus.Content = "Paused...";
+            lblStatus.Content = "- Paused -";
 
             btnPlay.Visibility = Visibility.Visible;
             btnPause.Visibility = Visibility.Collapsed;
@@ -164,10 +170,10 @@ namespace Mp3_Player
         {
             if (e.Key == Key.Space)
             {
-                if (lblStatus.Content != "Paused...")
+                if (lblStatus.Content != "- Paused -")
                 {
                     _mediaPlayer.Pause();
-                    lblStatus.Content = "Paused...";
+                    lblStatus.Content = "- Paused -";
 
                     btnPlay.Visibility = Visibility.Visible;
                     btnPause.Visibility = Visibility.Collapsed;
@@ -183,7 +189,7 @@ namespace Mp3_Player
             if (_songList.Count > 0)
             {
                 _mediaPlayer.Stop();
-                lblStatus.Content = "Stopped...";
+                lblStatus.Content = "- Stopped -";
 
                 btnPlay.Visibility = Visibility.Visible;
                 btnPause.Visibility = Visibility.Collapsed;
@@ -200,48 +206,51 @@ namespace Mp3_Player
             {
                 foreach (String file in openFileDialog.FileNames)
                 {
-                    bool isTheSongInTheList = false;
-                    for (int i = 0; i < _songList.Count; i++)
-                    {
-                        if (file.Equals(_songList[i]))
-                        {
-                            isTheSongInTheList = true;
-                        }
-                    }
-
-                    if (isTheSongInTheList == false)
-                    {
-                        _songList.Add(file);
-                        _songCounter++;
-                        StackPanel sp = new StackPanel
-                        {
-                            Orientation = Orientation.Horizontal,
-                            Width = 1150,
-                            Margin = new Thickness(2),
-                            Background = new SolidColorBrush(Color.FromArgb(0xFF, 45, 45, 45)),
-                            Tag = file,
-                            Cursor = Cursors.Hand
-                        };
-                        sp.MouseLeftButtonDown += new MouseButtonEventHandler(addedSongsClick);
-                        addedSongsScrollViewer.Children.Add(sp);
-
-                        TextBlock tb = new TextBlock
-                        {
-                            Text = _songCounter + ". " + Path.GetFileName(file).Replace(".mp3", ""),
-                            FontFamily = new FontFamily("Courier New"),
-                            Tag = file,
-                            FontWeight = FontWeights.Bold,
-                            FontSize = 16,
-                            Width = 1010,
-                            Foreground = Brushes.White,
-                            Margin = new Thickness(10),
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Center
-                        };
-                        sp.Children.Add(tb);
-                    }
+                    AddSong(file);
                 }
             }
+        }
+        private void AddSong(string file)
+        {
+            bool isTheSongInTheList = false;
+            for (int i = 0; i < _songList.Count; i++)
+            {
+                if (file.Equals(_songList[i]))
+                {
+                    isTheSongInTheList = true;
+                }
+            }
+
+            if (isTheSongInTheList == false)
+            {
+                _songList.Add(file);
+                _songCounter++;
+                StackPanel sp = new StackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    Margin = new Thickness(2),
+                    Background = new SolidColorBrush(Color.FromArgb(0xFF, 35, 35, 35)),
+                    Tag = file,
+                    Cursor = Cursors.Hand
+                };
+                sp.MouseLeftButtonDown += new MouseButtonEventHandler(addedSongsClick);
+                addedSongsScrollViewer.Children.Add(sp);
+
+                TextBlock tb = new TextBlock
+                {
+                    Text = _songCounter + ". " + Path.GetFileName(file).Replace(".mp3", ""),
+                    FontFamily = new FontFamily("Bahnschrift Condensed"),
+                    FontSize = 22,
+                    Width = 1200,
+                    Foreground = Brushes.White,
+                    Margin = new Thickness(5)
+                };
+                sp.Children.Add(tb);
+
+                if (_songCounter >= 12) { mainScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Visible; }
+                else { mainScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled; }
+            }
+
         }
 
         // SHUFFLE BUTTONS
@@ -414,7 +423,7 @@ namespace Mp3_Player
         private void volumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             _mediaPlayer.Volume = volumeSlider.Value;
-            if(volumeSlider.Value > 0)
+            if (volumeSlider.Value > 0)
             {
                 volumeIconOff.Visibility = Visibility.Collapsed;
                 volumeIconOn.Visibility = Visibility.Visible;
@@ -424,19 +433,33 @@ namespace Mp3_Player
                 volumeIconOn.Visibility = Visibility.Collapsed;
                 volumeIconOff.Visibility = Visibility.Visible;
             }
+            Properties.Settings.Default.volume = volumeSlider.Value;
+            Properties.Settings.Default.Save();
         }
         private void volumeIconOn_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             _volumeValue = volumeSlider.Value;
             volumeSlider.Value = 0;
-            volumeIconOn.Visibility = Visibility.Collapsed;
-            volumeIconOff.Visibility = Visibility.Visible;
+            volumeIconCheck();
         }
         private void volumeIconOff_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            volumeSlider.Value = _volumeValue;
-            volumeIconOff.Visibility = Visibility.Collapsed;
-            volumeIconOn.Visibility = Visibility.Visible;
+            if (_volumeValue != 0) volumeSlider.Value = _volumeValue;
+            else volumeSlider.Value = 1;
+            volumeIconCheck();
+        }
+        private void volumeIconCheck()
+        {
+            if (volumeSlider.Value == 0)
+            {
+                volumeIconOn.Visibility = Visibility.Collapsed;
+                volumeIconOff.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                volumeIconOff.Visibility = Visibility.Collapsed;
+                volumeIconOn.Visibility = Visibility.Visible;
+            }
         }
 
         // DRAG WINDOW FUNCTION
@@ -452,16 +475,172 @@ namespace Mp3_Player
         private void btnExit_MouseEnter(object sender, MouseEventArgs e)
         {
             btnExit.Background = Brushes.Red;
-            lblExit.Foreground = Brushes.White;
         }
         private void btnExit_MouseLeave(object sender, MouseEventArgs e)
         {
-            btnExit.Background = Brushes.LightGray;
-            lblExit.Foreground = Brushes.Black;
+            btnExit.Background = new SolidColorBrush(Color.FromArgb(0xFF, 29, 29, 29));
         }
         private void btnExit_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Close();
+        }
+
+        // YOUTUBE DOWNLOAD OPTIONS
+        private void youtubeButtonUrl_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(textYoutubeUrl.Text))
+                {
+                    string searchUrl = "https://www.youtube.com/results?search_query=" + Regex.Replace(textYoutubeUrl.Text, @"[^\u0000-\u007F]+", string.Empty).Replace("()", "").Replace(",", "").Replace(" ", "%20");
+                    HttpWebRequest myRequest = (HttpWebRequest)WebRequest.Create(searchUrl);
+                    myRequest.Method = "GET";
+                    WebResponse myResponse = myRequest.GetResponse();
+                    StreamReader sr = new StreamReader(myResponse.GetResponseStream(), System.Text.Encoding.UTF8);
+                    string result = sr.ReadToEnd();
+                    sr.Close();
+                    myResponse.Close();
+
+                    listSearchResult.Children.Clear();
+
+                    List<int> foundIndexesTitle = new List<int>();
+                    for (int i = result.IndexOf("\"title\":{\"runs\":[{\"text\":\""); i > -1; i = result.IndexOf("\"title\":{\"runs\":[{\"text\":\"", i + 1)) { foundIndexesTitle.Add(i); }
+                    for (int k = 0; k < 20; k++)
+                    {
+                        string startingText = result.Substring(foundIndexesTitle[k] + 26, 300);
+                        int lastIndex = startingText.IndexOf("\"}],\"accessibility\"");
+                        string finalTextTitle = startingText.Substring(0, lastIndex);
+
+                        string code = result.Substring(foundIndexesTitle[k], 10000);
+                        string codeForImg = result.Substring(foundIndexesTitle[k] - 2000, 10000);
+
+                        string url = code.Substring(code.IndexOf("/watch?v="), 20);
+
+                        int timefrom = code.IndexOf("\"}},\"simpleText\":\"") + 18;
+                        string time = code.Substring(timefrom, code.Remove(0, timefrom).IndexOf("},\"") - 1);
+
+                        int whofrom = code.IndexOf("longBylineText\":{\"runs\":[{\"text\":") + 34;
+                        string who = code.Substring(whofrom, code.Remove(0, whofrom).IndexOf("\",\"navigationEndpoin"));
+
+                        int imgfrom = codeForImg.IndexOf("\",\"thumbnail\":{\"thumbnails\":[{\"url\":\"") + 37;
+                        string img = codeForImg.Substring(imgfrom, codeForImg.Remove(0, imgfrom).IndexOf("\",\"width\""));
+
+                        StackPanel sp = new StackPanel
+                        {
+                            Orientation = Orientation.Horizontal,
+                            Background = new SolidColorBrush(Color.FromArgb(0xFF, 23, 23, 23)),
+                            Margin = new Thickness(5, 5, 5, 0),
+                            Tag = "https://www.youtube.com" + url,
+                            Cursor = Cursors.Hand
+                        };
+                        sp.MouseLeftButtonDown += new MouseButtonEventHandler(songItemClick);
+                        sp.MouseEnter += new MouseEventHandler(songTextEnter);
+                        sp.MouseLeave += new MouseEventHandler(songTextLeave);
+                        listSearchResult.Children.Add(sp);
+
+                        Image dynamicImage = new Image
+                        {
+                            Width = 200,
+                            Height = 100,
+                            Stretch = Stretch.Fill
+                        };
+                        dynamicImage.Source = new BitmapImage(new Uri(img, UriKind.Absolute), new RequestCachePolicy(RequestCacheLevel.BypassCache)) { CacheOption = BitmapCacheOption.OnLoad };
+                        sp.Children.Add(dynamicImage);
+
+                        StackPanel spText = new StackPanel { Orientation = Orientation.Vertical };
+                        sp.Children.Add(spText);
+
+                        TextBlock tbTitle = new TextBlock
+                        {
+                            Width = 600,
+                            Text = finalTextTitle,
+                            FontSize = 22,
+                            FontFamily = new FontFamily("Bahnschrift Condensed"),
+                            Foreground = Brushes.White,
+                            TextWrapping = TextWrapping.Wrap,
+                            Margin = new Thickness(15, 3, 10, 0)
+                        };
+                        spText.Children.Add(tbTitle);
+
+                        TextBlock tbDescription = new TextBlock
+                        {
+                            Width = 600,
+                            Text = "Duration: " + time.Replace(".", ":") + "     By: " + who,
+                            FontSize = 18,
+                            FontFamily = new FontFamily("Bahnschrift Condensed"),
+                            Foreground = Brushes.Gray,
+                            Margin = new Thickness(15, 0, 10, 3)
+                        };
+                        spText.Children.Add(tbDescription);
+                    }
+                    scrollViewer.ScrollToTop();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
+        }
+        private void songTextLeave(object sender, MouseEventArgs e)
+        {
+            (sender as StackPanel).Background = new SolidColorBrush(Color.FromArgb(0xFF, 23, 23, 23));
+        }
+        private void songTextEnter(object sender, MouseEventArgs e)
+        {
+            (sender as StackPanel).Background = new SolidColorBrush(Color.FromArgb(0xFF, 45, 45, 45));
+        }
+        private void songItemClick(object sender, MouseButtonEventArgs e)
+        {
+            string url = (sender as StackPanel).Tag.ToString();
+            string location = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            if (!string.IsNullOrEmpty(textLocationToDownload.Text)) location = textLocationToDownload.Text;
+            SaveMP3(location, url);
+
+            var drawer = DrawerHost.CloseDrawerCommand;
+            drawer.Execute(null, null);
+            scrollViewer.ScrollToTop();
+        }
+        private void SaveMP3(string SaveToFolder, string VideoURL)
+        {
+            string path = new DirectoryInfo(Environment.CurrentDirectory).Parent.Parent.FullName;
+
+            string source = SaveToFolder;
+            var youtube = YouTube.Default;
+            var vid = youtube.GetVideo(VideoURL);
+            string videopath = Path.Combine(path, vid.FullName);
+            File.WriteAllBytes(videopath, vid.GetBytes());
+
+            var inputFile = new MediaFile { Filename = Path.Combine(path, vid.FullName) };
+            var outputFile = new MediaFile { Filename = Path.Combine(source, vid.FullName.Replace(".mp4", "") + ".mp3") };
+            string filenameFinal = outputFile.Filename;
+
+            using (var engine = new Engine())
+            {
+                engine.GetMetadata(inputFile);
+                engine.Convert(inputFile, outputFile);
+            }
+            File.Delete(Path.Combine(path, vid.FullName));
+            AddSong(filenameFinal);
+        }
+        private void btnLocation_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new SaveFileDialog();
+            dialog.InitialDirectory = @"C:\Users\Stefan\Desktop";
+            dialog.Title = "Select a Directory";
+            dialog.Filter = "Directory|*.this.directory"; 
+            dialog.FileName = "select"; 
+            if (dialog.ShowDialog() == true)
+            {
+                string path = dialog.FileName;
+                path = path.Replace("\\select.this.directory", "");
+                path = path.Replace(".this.directory", "");
+
+                if (Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+                textLocationToDownload.Text = path;
+            }
         }
     }
 }
