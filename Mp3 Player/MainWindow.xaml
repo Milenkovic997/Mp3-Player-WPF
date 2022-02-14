@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Mp3_Player"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="MainWindow" Height="700" Width="1200" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None" KeyDown="Window_KeyDown" Background="Crimson">
+        Title="MainWindow" Height="700" Width="1200" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None" KeyDown="Window_KeyDown" BorderBrush="#FF383838">
 
     <!-- VISUAL_DESIGN_STYLES -->
     <Window.Resources>
@@ -114,7 +114,7 @@
                             </Button>
                         </StackPanel>
                         <StackPanel x:Name="panelSong" Orientation="Horizontal" Margin="0,10,0,0" >
-                            <TextBox x:Name="textYoutubeUrl" Width="742" materialDesign:HintAssist.Hint="Enter a song name" Foreground="White" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="24" FontFamily="Bahnschrift Condensed"/>
+                            <TextBox x:Name="textYoutubeUrl" Width="742" materialDesign:HintAssist.Hint="Enter a song name" Foreground="White" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="24" FontFamily="Bahnschrift Condensed" PreviewKeyDown="textYoutubeUrl_PreviewKeyDown"/>
                             <Button x:Name="youtubeButtonUrl" Width="117" Margin="10,0,0,0" Click="youtubeButtonUrl_Click" Background="Black" Foreground="#DDFFFFFF" VerticalAlignment="Center" BorderBrush="White" Height="39">
                                 <StackPanel Orientation="Horizontal" Width="85" HorizontalAlignment="Center">
                                     <TextBlock VerticalAlignment="Center" FontFamily="Bahnschrift Condensed" FontSize="24" Width="60" FontWeight="Bold">Search</TextBlock>

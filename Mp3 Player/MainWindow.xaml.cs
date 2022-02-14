@@ -488,6 +488,18 @@ namespace Mp3_Player
         // YOUTUBE DOWNLOAD OPTIONS
         private void youtubeButtonUrl_Click(object sender, RoutedEventArgs e)
         {
+            searchYoutubeButton();
+            
+        }
+        private void textYoutubeUrl_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                searchYoutubeButton();
+            }
+        }
+        private void searchYoutubeButton()
+        {
             try
             {
                 if (!string.IsNullOrEmpty(textYoutubeUrl.Text))
@@ -525,53 +537,56 @@ namespace Mp3_Player
                         int imgfrom = codeForImg.IndexOf("\",\"thumbnail\":{\"thumbnails\":[{\"url\":\"") + 37;
                         string img = codeForImg.Substring(imgfrom, codeForImg.Remove(0, imgfrom).IndexOf("\",\"width\""));
 
-                        StackPanel sp = new StackPanel
+                        if (time.Length < 10)
                         {
-                            Orientation = Orientation.Horizontal,
-                            Background = new SolidColorBrush(Color.FromArgb(0xFF, 23, 23, 23)),
-                            Margin = new Thickness(5, 5, 5, 0),
-                            Tag = "https://www.youtube.com" + url,
-                            Cursor = Cursors.Hand
-                        };
-                        sp.MouseLeftButtonDown += new MouseButtonEventHandler(songItemClick);
-                        sp.MouseEnter += new MouseEventHandler(songTextEnter);
-                        sp.MouseLeave += new MouseEventHandler(songTextLeave);
-                        listSearchResult.Children.Add(sp);
+                            StackPanel sp = new StackPanel
+                            {
+                                Orientation = Orientation.Horizontal,
+                                Background = new SolidColorBrush(Color.FromArgb(0xFF, 23, 23, 23)),
+                                Margin = new Thickness(5, 5, 5, 0),
+                                Tag = "https://www.youtube.com" + url,
+                                Cursor = Cursors.Hand
+                            };
+                            sp.MouseLeftButtonDown += new MouseButtonEventHandler(songItemClick);
+                            sp.MouseEnter += new MouseEventHandler(songTextEnter);
+                            sp.MouseLeave += new MouseEventHandler(songTextLeave);
+                            listSearchResult.Children.Add(sp);
 
-                        Image dynamicImage = new Image
-                        {
-                            Width = 200,
-                            Height = 100,
-                            Stretch = Stretch.Fill
-                        };
-                        dynamicImage.Source = new BitmapImage(new Uri(img, UriKind.Absolute), new RequestCachePolicy(RequestCacheLevel.BypassCache)) { CacheOption = BitmapCacheOption.OnLoad };
-                        sp.Children.Add(dynamicImage);
+                            Image dynamicImage = new Image
+                            {
+                                Width = 200,
+                                Height = 100,
+                                Stretch = Stretch.Fill
+                            };
+                            dynamicImage.Source = new BitmapImage(new Uri(img, UriKind.Absolute), new RequestCachePolicy(RequestCacheLevel.BypassCache)) { CacheOption = BitmapCacheOption.OnLoad };
+                            sp.Children.Add(dynamicImage);
 
-                        StackPanel spText = new StackPanel { Orientation = Orientation.Vertical };
-                        sp.Children.Add(spText);
+                            StackPanel spText = new StackPanel { Orientation = Orientation.Vertical };
+                            sp.Children.Add(spText);
 
-                        TextBlock tbTitle = new TextBlock
-                        {
-                            Width = 600,
-                            Text = finalTextTitle,
-                            FontSize = 22,
-                            FontFamily = new FontFamily("Bahnschrift Condensed"),
-                            Foreground = Brushes.White,
-                            TextWrapping = TextWrapping.Wrap,
-                            Margin = new Thickness(15, 3, 10, 0)
-                        };
-                        spText.Children.Add(tbTitle);
+                            TextBlock tbTitle = new TextBlock
+                            {
+                                Width = 600,
+                                Text = finalTextTitle,
+                                FontSize = 22,
+                                FontFamily = new FontFamily("Bahnschrift Condensed"),
+                                Foreground = Brushes.White,
+                                TextWrapping = TextWrapping.Wrap,
+                                Margin = new Thickness(15, 3, 10, 0)
+                            };
+                            spText.Children.Add(tbTitle);
 
-                        TextBlock tbDescription = new TextBlock
-                        {
-                            Width = 600,
-                            Text = "Duration: " + time.Replace(".", ":") + "     By: " + who,
-                            FontSize = 18,
-                            FontFamily = new FontFamily("Bahnschrift Condensed"),
-                            Foreground = Brushes.Gray,
-                            Margin = new Thickness(15, 0, 10, 3)
-                        };
-                        spText.Children.Add(tbDescription);
+                            TextBlock tbDescription = new TextBlock
+                            {
+                                Width = 600,
+                                Text = "Duration: " + time.Replace(".", ":") + "     By: " + who,
+                                FontSize = 18,
+                                FontFamily = new FontFamily("Bahnschrift Condensed"),
+                                Foreground = Brushes.Gray,
+                                Margin = new Thickness(15, 0, 10, 3)
+                            };
+                            spText.Children.Add(tbDescription);
+                        }
                     }
                     scrollViewer.ScrollToTop();
                 }
@@ -581,6 +596,7 @@ namespace Mp3_Player
                 Debug.WriteLine(ex);
             }
         }
+
         private void songTextLeave(object sender, MouseEventArgs e)
         {
             (sender as StackPanel).Background = new SolidColorBrush(Color.FromArgb(0xFF, 23, 23, 23));
@@ -600,6 +616,7 @@ namespace Mp3_Player
             drawer.Execute(null, null);
             scrollViewer.ScrollToTop();
         }
+
         private void SaveMP3(string SaveToFolder, string VideoURL)
         {
             string path = new DirectoryInfo(Environment.CurrentDirectory).Parent.Parent.FullName;
@@ -642,5 +659,7 @@ namespace Mp3_Player
                 textLocationToDownload.Text = path;
             }
         }
+
+        
     }
 }
